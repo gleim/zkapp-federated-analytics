@@ -1,6 +1,6 @@
 # Mina zkApp: Zkapp Federated Analytics
 
-This template uses TypeScript.
+This example uses TypeScript.
 
 ## How to build
 
