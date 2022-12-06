@@ -14,8 +14,21 @@ import {
   AccountUpdate,
 } from 'snarkyjs';
 
+// wait for snarkyjs to be available
+await isReady;
+
+// wait for recursion function to compile
+await FedAvgZkProgram.compile();
+
 // use the recursive program to create a proof
-//const proof = await FedAvgZkProgram.baseCase(Field(0));
+const proof = await FedAvgZkProgram.baseCase(Field(0));
+console.log('Proof: ', proof);
+
+const proof1 = await FedAvgZkProgram.step(Field(1), proof);
+console.log('Proof1: ', proof1);
+
+const proof2 = await FedAvgZkProgram.step(Field(2), proof1);
+console.log('Proof2: ', proof2);
 
 describe('FedAvg', () => {
   let deployerAccount: PrivateKey,
@@ -25,7 +38,6 @@ describe('FedAvg', () => {
 
   beforeAll(async () => {
     await isReady;
-    await FedAvgZkProgram.compile();
     await FedAvg.compile();
   });
 
@@ -59,5 +71,21 @@ describe('FedAvg', () => {
     await localDeploy();
     const num = zkApp.num.get();
     expect(num).toEqual(Field(0));
+  });
+
+  it('verifies the `FedAvg` base case operation', async () => {
+    await localDeploy();
+
+    zkApp.verifyProof(proof);
+
+    expect(zkApp.num.get()).toEqual(Field(0));
+  });
+
+  it('verifies the first `FedAvg` step operation', async () => {
+    await localDeploy();
+
+    zkApp.verifyProof(proof1);
+
+    expect(true).toEqual(true);
   });
 });
