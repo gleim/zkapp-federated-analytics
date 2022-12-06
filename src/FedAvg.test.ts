@@ -1,4 +1,9 @@
-import { Add } from './Add';
+/*
+ * This file specifies how to test the `FedAvg` example smart contract.
+ */
+
+import { FedAvg, FedAvgZkProgram } from './FedAvg';
+
 import {
   isReady,
   shutdown,
@@ -9,33 +14,28 @@ import {
   AccountUpdate,
 } from 'snarkyjs';
 
-/*
- * This file specifies how to test the `Add` example smart contract. It is safe to delete this file and replace
- * with your own tests.
- *
- * See https://docs.minaprotocol.com/zkapps for more info.
- */
+// use the recursive program to create a proof
+//const proof = await FedAvgZkProgram.baseCase(Field(0));
 
-let proofsEnabled = false;
-
-describe('Add', () => {
+describe('FedAvg', () => {
   let deployerAccount: PrivateKey,
     zkAppAddress: PublicKey,
     zkAppPrivateKey: PrivateKey,
-    zkApp: Add;
+    zkApp: FedAvg;
 
   beforeAll(async () => {
     await isReady;
-    if (proofsEnabled) Add.compile();
+    await FedAvgZkProgram.compile();
+    await FedAvg.compile();
   });
 
   beforeEach(() => {
-    const Local = Mina.LocalBlockchain({ proofsEnabled });
+    const Local = Mina.LocalBlockchain();
     Mina.setActiveInstance(Local);
     deployerAccount = Local.testAccounts[0].privateKey;
     zkAppPrivateKey = PrivateKey.random();
     zkAppAddress = zkAppPrivateKey.toPublicKey();
-    zkApp = new Add(zkAppAddress);
+    zkApp = new FedAvg(zkAppAddress);
   });
 
   afterAll(() => {
@@ -55,23 +55,9 @@ describe('Add', () => {
     await txn.sign([zkAppPrivateKey]).send();
   }
 
-  it('generates and deploys the `Add` smart contract', async () => {
+  it('generates and deploys the `FedAvg` smart contract', async () => {
     await localDeploy();
     const num = zkApp.num.get();
-    expect(num).toEqual(Field(1));
-  });
-
-  it('correctly updates the num state on the `Add` smart contract', async () => {
-    await localDeploy();
-
-    // update transaction
-    const txn = await Mina.transaction(deployerAccount, () => {
-      zkApp.update();
-    });
-    await txn.prove();
-    await txn.send();
-
-    const updatedNum = zkApp.num.get();
-    expect(updatedNum).toEqual(Field(3));
+    expect(num).toEqual(Field(0));
   });
 });

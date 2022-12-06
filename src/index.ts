@@ -1,3 +1,3 @@
-import { Add } from './Add.js';
+import { FedAvg } from './FedAvg.js';
 
-export { Add };
+export { FedAvg };
