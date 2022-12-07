@@ -8,7 +8,7 @@ import {
   state,
 } from 'snarkyjs';
 
-export const FedAvgZkProgram = Experimental.ZkProgram({
+export const ProofOfComputeSequence = Experimental.ZkProgram({
   publicInput: Field,
 
   methods: {
@@ -16,7 +16,8 @@ export const FedAvgZkProgram = Experimental.ZkProgram({
       privateInputs: [],
 
       method(publicInput: Field) {
-        publicInput.assertEquals(Field(0));
+        // base case
+        publicInput;
       },
     },
 

@@ -2,7 +2,7 @@
  * This file specifies how to test the `FedAvg` example smart contract.
  */
 
-import { FedAvg, FedAvgZkProgram } from './FedAvg';
+import { FedAvg, ProofOfComputeSequence } from './FedAvg';
 
 import {
   verify,
@@ -19,14 +19,22 @@ import {
 await isReady;
 
 // wait for recursion function to compile
-const { verificationKey } = await FedAvgZkProgram.compile();
+const { verificationKey } = await ProofOfComputeSequence.compile();
 
 // use the recursive program to create a proof
-const proof = await FedAvgZkProgram.baseCase(Field(0));
+const proof = await ProofOfComputeSequence.baseCase(Field(0));
 
-const proof1 = await FedAvgZkProgram.step(Field(5), proof);
+// average accumulator with proof
+const proof1 = await ProofOfComputeSequence.step(
+  Field(5).add(Field(10)).add(Field(12)).div(3),
+  proof
+);
 
-const proof2 = await FedAvgZkProgram.step(Field(8), proof1);
+// average accumulator with proof
+const proof2 = await ProofOfComputeSequence.step(
+  Field(8).add(Field(3)).add(Field(4)).div(3),
+  proof1
+);
 
 describe('FedAvg', () => {
   let deployerAccount: PrivateKey,
@@ -90,7 +98,7 @@ describe('FedAvg', () => {
     const ok = await verify(proof1.toJSON(), verificationKey);
     console.log(ok, '\n', proof1.toJSON().publicInput);
 
-    expect(proof1.toJSON().publicInput).toEqual(['5']);
+    expect(proof1.toJSON().publicInput).toEqual(['9']);
   });
 
   it('verifies the second `FedAvg` step operation', async () => {
@@ -101,6 +109,6 @@ describe('FedAvg', () => {
     const ok = await verify(proof2.toJSON(), verificationKey);
     console.log(ok, '\n', proof2.toJSON().publicInput);
 
-    expect(proof2.toJSON().publicInput).toEqual(['8']);
+    expect(proof2.toJSON().publicInput).toEqual(['5']);
   });
 });
