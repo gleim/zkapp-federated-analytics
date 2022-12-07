@@ -14,7 +14,8 @@
  */
 import { Field, Mina, PrivateKey, shutdown } from 'snarkyjs';
 import fs from 'fs/promises';
-import { FedAvg, FedAvgZkProgram } from './FedAvg.js';
+import { ProofOfComputeSequence } from './SequenceProver.js';
+import { ProofVerifier } from './ProofVerifier.js';
 
 // check command line arg
 let network = process.argv[2];
@@ -42,19 +43,19 @@ let zkAppKey = PrivateKey.fromBase58(key.privateKey);
 const Network = Mina.Network(config.url);
 Mina.setActiveInstance(Network);
 let zkAppAddress = zkAppKey.toPublicKey();
-let zkApp = new FedAvg(zkAppAddress);
+let zkApp = new ProofVerifier(zkAppAddress);
 
 // compile the program to create verification keys
 console.log('compile the program...');
-const { verificationKey } = await FedAvgZkProgram.compile();
+const { verificationKey } = await zkApp.compile();
 console.log('program verification key: ', verificationKey);
 
 // compile the contract to create prover keys
 console.log('compile the contract...');
-await FedAvg.compile();
+await ProofOfComputeSequence.compile();
 
 // create proof for base case call to zk program
-const proof = await FedAvgZkProgram.baseCase(Field(0));
+const proof = await ProofOfComputeSequence.baseCase(Field(0));
 
 // call update() and send transaction
 console.log('build transaction and create proof...');

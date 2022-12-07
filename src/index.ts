@@ -1,3 +1,5 @@
-import { FedAvg } from './FedAvg.js';
+import { ProofOfComputeSequence } from './SequenceProver.js';
+import { ProofVerifier } from './ProofVerifier.js';
 
-export { FedAvg };
+export { ProofOfComputeSequence };
+export { ProofVerifier };

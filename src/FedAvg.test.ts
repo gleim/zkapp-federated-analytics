@@ -2,7 +2,8 @@
  * This file specifies how to test the `FedAvg` example smart contract.
  */
 
-import { FedAvg, ProofOfComputeSequence } from './FedAvg';
+import { ProofVerifier } from './ProofVerifier';
+import { ProofOfComputeSequence } from './SequenceProver';
 
 import {
   verify,
@@ -36,15 +37,15 @@ const proof2 = await ProofOfComputeSequence.step(
   proof1
 );
 
-describe('FedAvg', () => {
+describe('Proof of compute sequence, with Verifier', () => {
   let deployerAccount: PrivateKey,
     zkAppAddress: PublicKey,
     zkAppPrivateKey: PrivateKey,
-    zkApp: FedAvg;
+    zkApp: ProofVerifier;
 
   beforeAll(async () => {
     await isReady;
-    await FedAvg.compile();
+    await ProofVerifier.compile();
   });
 
   beforeEach(() => {
@@ -53,7 +54,7 @@ describe('FedAvg', () => {
     deployerAccount = Local.testAccounts[0].privateKey;
     zkAppPrivateKey = PrivateKey.random();
     zkAppAddress = zkAppPrivateKey.toPublicKey();
-    zkApp = new FedAvg(zkAppAddress);
+    zkApp = new ProofVerifier(zkAppAddress);
   });
 
   afterAll(() => {
@@ -73,12 +74,6 @@ describe('FedAvg', () => {
     await txn.sign([zkAppPrivateKey]).send();
   }
 
-  it('generates and deploys the `FedAvg` smart contract', async () => {
-    await localDeploy();
-    const num = zkApp.num.get();
-    expect(num).toEqual(Field(0));
-  });
-
   it('verifies the `FedAvg` base case operation', async () => {
     await localDeploy();
 
@@ -87,7 +82,7 @@ describe('FedAvg', () => {
     const ok = await verify(proof.toJSON(), verificationKey);
     console.log(ok, '\n', proof.toJSON().publicInput);
 
-    expect(zkApp.num.get()).toEqual(Field(0));
+    expect(proof.toJSON().publicInput).toEqual(['0']);
   });
 
   it('verifies the first `FedAvg` step operation', async () => {
