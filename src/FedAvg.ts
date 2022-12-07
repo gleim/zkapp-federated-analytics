@@ -25,8 +25,6 @@ export const FedAvgZkProgram = Experimental.ZkProgram({
 
       method(publicInput: Field, earlierProof: SelfProof<Field>) {
         earlierProof.verify();
-        //earlierProof.publicVar.assertEquals(publicVar);
-        earlierProof.publicInput.add(publicInput).div(2);
       },
     },
   },
@@ -49,7 +47,5 @@ export class FedAvg extends SmartContract {
 
   @method verifyProof(proof: SelfProof<Field>) {
     proof.verify();
-
-    // inspect proof state here
   }
 }

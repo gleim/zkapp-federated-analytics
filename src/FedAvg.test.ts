@@ -5,6 +5,7 @@
 import { FedAvg, FedAvgZkProgram } from './FedAvg';
 
 import {
+  verify,
   isReady,
   shutdown,
   Field,
@@ -18,17 +19,14 @@ import {
 await isReady;
 
 // wait for recursion function to compile
-await FedAvgZkProgram.compile();
+const { verificationKey } = await FedAvgZkProgram.compile();
 
 // use the recursive program to create a proof
 const proof = await FedAvgZkProgram.baseCase(Field(0));
-console.log('Proof: ', proof);
 
-const proof1 = await FedAvgZkProgram.step(Field(1), proof);
-console.log('Proof1: ', proof1);
+const proof1 = await FedAvgZkProgram.step(Field(5), proof);
 
-const proof2 = await FedAvgZkProgram.step(Field(2), proof1);
-console.log('Proof2: ', proof2);
+const proof2 = await FedAvgZkProgram.step(Field(8), proof1);
 
 describe('FedAvg', () => {
   let deployerAccount: PrivateKey,
@@ -78,6 +76,9 @@ describe('FedAvg', () => {
 
     zkApp.verifyProof(proof);
 
+    const ok = await verify(proof.toJSON(), verificationKey);
+    console.log(ok, '\n', proof.toJSON().publicInput);
+
     expect(zkApp.num.get()).toEqual(Field(0));
   });
 
@@ -86,6 +87,20 @@ describe('FedAvg', () => {
 
     zkApp.verifyProof(proof1);
 
-    expect(true).toEqual(true);
+    const ok = await verify(proof1.toJSON(), verificationKey);
+    console.log(ok, '\n', proof1.toJSON().publicInput);
+
+    expect(proof1.toJSON().publicInput).toEqual(['5']);
+  });
+
+  it('verifies the second `FedAvg` step operation', async () => {
+    await localDeploy();
+
+    zkApp.verifyProof(proof2);
+
+    const ok = await verify(proof2.toJSON(), verificationKey);
+    console.log(ok, '\n', proof2.toJSON().publicInput);
+
+    expect(proof2.toJSON().publicInput).toEqual(['8']);
   });
 });
