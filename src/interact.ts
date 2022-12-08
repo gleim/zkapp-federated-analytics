@@ -45,11 +45,6 @@ Mina.setActiveInstance(Network);
 let zkAppAddress = zkAppKey.toPublicKey();
 let zkApp = new ProofVerifier(zkAppAddress);
 
-// compile the program to create verification keys
-console.log('compile the program...');
-const { verificationKey } = await zkApp.compile();
-console.log('program verification key: ', verificationKey);
-
 // compile the contract to create prover keys
 console.log('compile the contract...');
 await ProofOfComputeSequence.compile();

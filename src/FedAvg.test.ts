@@ -1,5 +1,8 @@
 /*
- * This file specifies how to test the `FedAvg` example smart contract.
+ * This file specifies how to test the `FedAvg` synchronous compute example.
+ * To run locally:
+ * Build the project: `$ npm run build`
+ * Run with npm test: `$ npm test`
  */
 
 import { ProofVerifier } from './ProofVerifier';

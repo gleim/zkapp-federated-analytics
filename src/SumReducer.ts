@@ -1,4 +1,10 @@
-//import { NonSequentialReducer } from './NonSequentialReducer';
+/**
+ *
+ * To run locally:
+ * Build the project: `$ npm run build`
+ * Run with npx:      `$ npx snarky-run src/SumReducer.ts`
+ *
+ */
 
 import {
   Field,
@@ -15,8 +21,6 @@ import {
 } from 'snarkyjs';
 
 await isReady;
-
-const INCREMENT = Field(2);
 
 class SumReducer extends SmartContract {
   // the "reducer" field describes a type of action that we can dispatch, and reduce later
@@ -54,23 +58,21 @@ class SumReducer extends SmartContract {
         Field,
         // function that says how to apply an action
         (state: Field, _action: Field) => {
-//          counter.add(INCREMENT);
           return state.add(_action);
         },
         { state: rollingSum, actionsHash }
       );
 
-    let { state: newCounter, actionsHash: newDiscardActionsHash } =
-      this.reducer.reduce(
-        pendingActions,
-        // state type
-        Field,
-        // function that says how to apply an action
-        (state: Field, _action: Field) => {
-          return state.add(1);
-        },
-        { state: counter, actionsHash }
-      );
+    let { state: newCounter } = this.reducer.reduce(
+      pendingActions,
+      // state type
+      Field,
+      // function that says how to apply an action
+      (state: Field) => {
+        return state.add(1);
+      },
+      { state: counter, actionsHash }
+    );
 
     // update on-chain state
     this.counter.set(newCounter);
@@ -194,4 +196,3 @@ await tx.send();
 
 console.log('counter    after Sum rollup: ' + zkapp.counter.get());
 console.log('rollingSum after Sum rollup: ' + zkapp.rollingSum.get());
-
